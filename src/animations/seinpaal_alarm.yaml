@@ -1,0 +1,17 @@
+target_animation: SeinpaalAlarm
+
+sockets:
+  - /run/syncstream/virt-1-0
+
+parameters:
+  speed: 1
+  update_rate: 100
+  led_spacing: 16.5
+  paal_radius: 35
+  colour:
+    - 1
+    - 0
+    - 0
+
+metadata:
+  creator: ostheer

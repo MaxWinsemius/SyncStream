@@ -1,0 +1,28 @@
+interfaces:
+  - name: virt-1
+    interface-type: virtual
+    children:
+      - name: phys-1
+        interface-type: physical
+        ip: "localhost"
+        port: 1337
+        amount-leds: 10
+        max-udp-size: 320
+        max-brightness: 15
+      - name: phys-2
+        interface-type: physical
+        ip: "localhost"
+        port: 1338
+        amount-leds: 10
+        max-udp-size: 320
+        max-brightness: 15
+      - name: phys-3
+        interface-type: physical
+        ip: "localhost"
+        port: 1339
+        amount-leds: 10
+        max-udp-size: 320
+        max-brightness: 15
+
+sockets:
+  dir: /run/syncstream

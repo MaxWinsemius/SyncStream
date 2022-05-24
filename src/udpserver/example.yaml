@@ -1,0 +1,14 @@
+interfaces:
+  - name: virt-1
+    interface-type: virtual
+    children:
+      - name: phys-2
+        interface-type: physical
+        ip: "10.0.0.131"
+        port: 8888
+        amount-leds: 300
+        max-udp-size: 320
+        max-brightness: 15
+
+sockets:
+  dir: /run/syncstream

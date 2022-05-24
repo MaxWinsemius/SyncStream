@@ -1,0 +1,26 @@
+target_animation: Powersupply_kill
+
+sockets:
+  - /run/syncstream/virt-1-0
+
+parameters:
+  speed: 1
+  update_rate: 50
+  flame_colour:
+    - 1
+    - 1
+    - 1
+  flame_colour_fade:
+    - 0.1
+    - 0.4
+    - 0.4
+  flame_dropdown_chance: 0.03
+  flame_dropdown_distance: 0.05
+  flicker_sleep: 300 # in milliseconds
+  flicker_times: 100
+  random_green_chance: 0.35
+  random_green_flicker_pre_finish_sleep: 30
+  random_green_flicker_finish_sleep: 10
+
+metadata:
+  creator: Hernivo

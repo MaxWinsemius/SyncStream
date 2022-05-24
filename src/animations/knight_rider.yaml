@@ -1,0 +1,16 @@
+target_animation: KnightRider
+
+sockets:
+  - /run/syncstream/virt-1-0
+
+parameters:
+  speed: 1
+  update_rate: 50
+  tail_length: 15
+  colour:
+    - 1
+    - 0
+    - 0
+
+metadata:
+  creator: ostheer

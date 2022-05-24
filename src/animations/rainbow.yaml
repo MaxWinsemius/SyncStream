@@ -1,0 +1,11 @@
+target_animation: Rainbow
+
+sockets:
+  - /run/syncstream/virt-1
+
+parameters:
+  speed: 1
+  update_rate: 50
+
+metadata:
+  creator: ostheer
