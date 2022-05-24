@@ -7,11 +7,13 @@ def add_parser_subcommand(parser):
     p = parser.add_parser('udpserver', help = "Manage the udp server on this machine")
 
     sub = p.add_subparsers(dest = "udpserver")
-    commands = sub.add_parser('start', help = "Start the UDP server")
-    commands = sub.add_parser('stop', help = "Stop the UDP server")
-    commands = sub.add_parser('sockets', help = "List all the available sockets")
-    commands = sub.add_parser('dump-interfaces', help = "Dump the interface config")
-    commands = sub.add_parser('interfaces', help = "List the root interfaces")
+
+    # Commands
+    sub.add_parser('start', help = "Start the UDP server")
+    sub.add_parser('stop', help = "Stop the UDP server")
+    sub.add_parser('sockets', help = "List all the available sockets")
+    sub.add_parser('dump-interfaces', help = "Dump the interface config")
+    sub.add_parser('interfaces', help = "List the root interfaces")
 
     layers = sub.add_parser('layers', help = "Manage the layers of the UDP server")
     layers_sub = layers.add_subparsers(dest = "layers")
