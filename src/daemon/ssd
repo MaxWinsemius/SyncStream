@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+
+"""
+The syncstraem daemon, that keeps track of the animations that run, and prepares the system to make sure that the
+udpserver can run.
+
+@author MaxWinsemius
+@date 28-05-2022
+
+TODO:
+- Move many of these classes to their own files.
+- Test generic working of this code.
+- Add more configuration and argument options instead.
+- Remove repeating code (this and udpserver/interface/sovereign.py share a lot of code)
+
+DESIGN:
+Animation class should handle adding and removing animations, changing config files and overwriting specific options
+from the config files (for easy dynamic use of a generic template).
+"""
+
+import argparse
+import sys
+from enum import Enum
+
+class LogLevel(Enum):
+    ddebug = 0
+    debug = 1
+    info = 2
+    warning = 3
+    error = 4
+
+_loglevel = LogLevel.ddebug
+
+def log(loglevel, content):
+    if _loglevel <= loglevel:
+        print(f"{loglevel.name}: {content}", file=sys.stderr)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description = "Synsctream Daemon - Administrative daemon for the synsctream animations."
+    )
+
+    paths = {
+        "socket": "/run/syncstream/ssd.socket",
+        "animations": "src/animations/"
+    }
+    Socket(socket_path, animation_path)
+

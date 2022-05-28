@@ -3,6 +3,8 @@
 @date 24-05-2022
 """
 
+import sys
+
 def add_parser_subcommand(parser):
     p = parser.add_parser('udpserver', help = "Manage the udp server on this machine")
 
@@ -10,7 +12,7 @@ def add_parser_subcommand(parser):
 
     # Commands
     start = sub.add_parser('start', help = "Start the UDP server")
-    start.add_argument('-c', '--config', type = open, default = "src/udpserver/default.yaml", help = "The configuration file to load")
+    start.add_argument('-c', '--config', type = ascii, default = "src/udpserver/default.yaml", help = "The configuration file to load")
 
     sub.add_parser('stop', help = "Stop the UDP server")
     sub.add_parser('sockets', help = "List all the available sockets")
@@ -27,3 +29,32 @@ def add_parser_subcommand(parser):
 
     layers_del = layers_sub.add_parser('delete', help = "Delete a layer")
     layers_del.add_argument('index', type = int, help = "The index of the layer to remove")
+
+def exec(args):
+    command = args.udpserver
+
+    if command == "start":
+        print("starting server")
+        config = args.config
+        start(config)
+
+    elif command == "stop":
+        print("stopping server")
+
+    elif command == "sockets":
+        print("listing udpsockets")
+
+    elif command == "dump-interfaces":
+        print("dumping interface config")
+
+    elif command == "sockets":
+        print("listing root interfaces")
+
+    elif command == "layers":
+        print("manage the layers of this server")
+
+    else:
+        print("Unknown command used!", file = sys.stderr)
+
+def start(config):
+    pass
