@@ -4,12 +4,24 @@
 """
 
 import argparse
+import subprocess
+import os
 
 from . import commands
+
+def init_run():
+    if not os.path.isfile(run):
+        subprocess.call(f"sudo mkdir {run}".split(" "))
+        subprocess.call(f"sudo chown {os.getlogin()}:{os.getlogin()} {run}".split(" "))
+
+    if not os.access(run, os.R_OK) or not os.access(run, os.W_OK) or not os.access(run, os.X_OK):
+        subprocess.call(f"sudo chown {os.getlogin()}:{os.getlogin()} {run}".split(" "))
 
 parser = argparse.ArgumentParser(
     description = "SyncStream Remote - the cli tool for your SyncStream Daemon!",
 )
+
+parser.add_argument('-r', '--run', default = "/run/syncstream", help = 'The run folder in which syncstream creates sockets')
 
 subparsers = parser.add_subparsers()
 
@@ -21,9 +33,17 @@ args = parser.parse_args()
 from pprint import pprint
 pprint(args)
 
+run = args.run
+
 for command_obj in commands.all:
     command = command_obj.__name__.split('.')[-1]
     if hasattr(args, command):
-        command_obj.exec(args)
+        # TODO: Add command_obj.requires:
+        # - "run": needs the /run folder (or whatever is being used)
+        # - "ssd": needs the ssd to be running
+        # - more?
 
-print("exiting")
+        if "run" in command_obj.requires:
+            init_run()
+
+        command_obj.exec(args)

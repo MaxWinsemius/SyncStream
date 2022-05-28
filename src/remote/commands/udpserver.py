@@ -5,6 +5,9 @@
 
 import sys
 
+# This command will at least require the run folder to exist and be writable
+requires = ["run"]
+
 def add_parser_subcommand(parser):
     p = parser.add_parser('udpserver', help = "Manage the udp server on this machine")
 
