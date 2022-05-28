@@ -9,7 +9,9 @@ def add_parser_subcommand(parser):
     sub = p.add_subparsers(dest = "udpserver")
 
     # Commands
-    sub.add_parser('start', help = "Start the UDP server")
+    start = sub.add_parser('start', help = "Start the UDP server")
+    start.add_argument('-c', '--config', type = open, default = "src/udpserver/default.yaml", help = "The configuration file to load")
+
     sub.add_parser('stop', help = "Stop the UDP server")
     sub.add_parser('sockets', help = "List all the available sockets")
     sub.add_parser('dump-interfaces', help = "Dump the interface config")

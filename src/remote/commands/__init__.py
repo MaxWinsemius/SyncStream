@@ -4,7 +4,9 @@
 """
 
 from . import udpserver
+from . import animations
 
 all = [
-    udpserver
+    udpserver,
+    animations
 ]
