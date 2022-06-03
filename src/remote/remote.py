@@ -11,12 +11,13 @@ import subprocess
 from . import commands
 
 def init_run():
-    print("Creating {run} folder", file = sys.stderr)
-    if not os.path.isfile(run):
+    if not os.path.isdir(run):
+        print(f"Creating {run} folder", file = sys.stderr)
         subprocess.call(f"sudo mkdir {run}".split(" "))
         subprocess.call(f"sudo chown {os.getlogin()}:{os.getlogin()} {run}".split(" "))
 
     if not os.access(run, os.R_OK) or not os.access(run, os.W_OK) or not os.access(run, os.X_OK):
+        print(f"Chowning {run} folder", file = sys.stderr)
         subprocess.call(f"sudo chown {os.getlogin()}:{os.getlogin()} {run}".split(" "))
 
 parser = argparse.ArgumentParser(
@@ -32,8 +33,8 @@ for command in commands.all:
 
 args = parser.parse_args()
 
-from pprint import pprint
-pprint(args)
+#from pprint import pprint
+#pprint(args)
 
 run = args.run
 
@@ -48,4 +49,5 @@ for command_obj in commands.all:
         if "run" in command_obj.requires:
             init_run()
 
+        command_obj.run = run
         command_obj.exec(args)

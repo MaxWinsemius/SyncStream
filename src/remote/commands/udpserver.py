@@ -3,10 +3,12 @@
 @date 24-05-2022
 """
 
+import os
 import sys
 
 # This command will at least require the run folder to exist and be writable
 requires = ["run"]
+run = None
 
 def add_parser_subcommand(parser):
     p = parser.add_parser('udpserver', help = "Manage the udp server on this machine")
@@ -19,7 +21,6 @@ def add_parser_subcommand(parser):
     start.add_argument('-c', '--config', default = "src/udpserver/default.yaml", help = "The configuration file to load")
 
     sub.add_parser('stop', help = "Stop the UDP server")
-    sub.add_parser('sockets', help = "List all the available sockets")
     sub.add_parser('dump-interfaces', help = "Dump the interface config")
     sub.add_parser('interfaces', help = "List the root interfaces")
 
@@ -29,7 +30,8 @@ def add_parser_subcommand(parser):
 
     layers_add = layers_sub.add_parser('add', help = "Add a new layer")
     layers_add.add_argument('index', type = int, help = "The index of where to insert the layer")
-    layers_add.add_argument('-a', '--authorative', action = 'store_true', help = "Make this layer authoritive over the underlying layers. That means it is not transparent to underlying layers, but layers above can write over this layer.")
+    layers_add.add_argument('-a', '--authorative', action = 'store_true', help = "Whenever this layer updates, the framebuffer will be send out. Every root interface needs at least a single authorative layer.")
+    layers_add.add_argument('-o', '--overwrite', action = "store_true", help = "Overwrite any leds that are not set to 0")
 
     layers_del = layers_sub.add_parser('delete', help = "Delete a layer")
     layers_del.add_argument('index', type = int, help = "The index of the layer to remove")
@@ -38,29 +40,25 @@ def exec(args):
     command = args.udpserver
 
     if command == "start":
-        print("starting server")
-        config = args.config
-        start(config)
+        cmd_start(args.config)
 
     elif command == "stop":
-        print("stopping server")
-
-    elif command == "sockets":
-        print("listing udpsockets")
+        cmd_stop()
 
     elif command == "dump-interfaces":
-        print("dumping interface config")
+        cmd_dump_interfaces()
 
-    elif command == "sockets":
-        print("listing root interfaces")
+    elif command == "interfaces":
+        cmd_list_interfaces()
 
     elif command == "layers":
-        print("manage the layers of this server")
+        # parse the rest of this information
+        pass
 
     else:
         print("Unknown command used!", file = sys.stderr)
 
-def start(config):
+def cmd_start(config):
     # Check if socket exists
     #if os.path.isfile("")
         # Check if server is already running with a ping / getinfo command
@@ -69,3 +67,14 @@ def start(config):
         # Remove the socket
     # Start the server
     pass
+
+def cmd_stop():
+    pass
+
+def cmd_dump_interfaces():
+    pass
+
+def cmd_list_interfaces():
+    global run
+    for item in os.listdir(run):
+        print(item)

@@ -26,6 +26,12 @@ def deb_print(txt):
 class Command:
     GET_INFO = 0
     SEND_BUFFER = 1
+    PING = 2
+    STOP = 3
+    DUMP_INTERFACES = 4 # Dump the yaml interfaces config
+    LIST_INTERFACES = 5 # List all root interfaces
+    LAYERS_ADD = 20
+    LAYERS_DEL = 21
 
 class Handler(socketserver.StreamRequestHandler):
     def handle(self):
@@ -85,9 +91,6 @@ class Layer:
         self.framebuffer = framebuffer
 
 class Root:
-    _CMD_ID_GET_INFO = 0
-    _CMD_ID_SEND_BUFFER = 1
-
     def __init__(self, iface, path):
         self.iface = iface
         self.layers = []
