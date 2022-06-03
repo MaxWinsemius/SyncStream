@@ -10,12 +10,13 @@ requires = ["run"]
 
 def add_parser_subcommand(parser):
     p = parser.add_parser('udpserver', help = "Manage the udp server on this machine")
+    p.add_argument('-s', '--server', default = "src/udpserver/udpserver.py", help = "Location of the udpserver.py file")
 
     sub = p.add_subparsers(dest = "udpserver")
 
     # Commands
     start = sub.add_parser('start', help = "Start the UDP server")
-    start.add_argument('-c', '--config', type = ascii, default = "src/udpserver/default.yaml", help = "The configuration file to load")
+    start.add_argument('-c', '--config', default = "src/udpserver/default.yaml", help = "The configuration file to load")
 
     sub.add_parser('stop', help = "Stop the UDP server")
     sub.add_parser('sockets', help = "List all the available sockets")
@@ -60,4 +61,11 @@ def exec(args):
         print("Unknown command used!", file = sys.stderr)
 
 def start(config):
+    # Check if socket exists
+    #if os.path.isfile("")
+        # Check if server is already running with a ping / getinfo command
+            # Error out noting that the server is already running
+
+        # Remove the socket
+    # Start the server
     pass

@@ -3,13 +3,15 @@
 @date 28-05-2022
 """
 
+import os
+import sys
 import argparse
 import subprocess
-import os
 
 from . import commands
 
 def init_run():
+    print("Creating {run} folder", file = sys.stderr)
     if not os.path.isfile(run):
         subprocess.call(f"sudo mkdir {run}".split(" "))
         subprocess.call(f"sudo chown {os.getlogin()}:{os.getlogin()} {run}".split(" "))
