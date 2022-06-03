@@ -5,6 +5,9 @@
 
 import os
 import sys
+import subprocess
+from .connection import Connection
+from .command import CommandTypes
 
 # This command will at least require the run folder to exist and be writable
 requires = ["run"]
@@ -49,7 +52,8 @@ def exec(args):
         cmd_dump_interfaces()
 
     elif command == "interfaces":
-        cmd_list_interfaces()
+        for file in cmd_list_interfaces():
+            print(file)
 
     elif command == "layers":
         # parse the rest of this information
@@ -58,15 +62,36 @@ def exec(args):
     else:
         print("Unknown command used!", file = sys.stderr)
 
+def ping(interface):
+    socket_path = f"{run}/{interface}"
+    if not os.path.exists(socket_path):
+        print(f"Socket {socket_path} does not exist", file = sys.stderr)
+        exit(1)
+    socket = Connection(socket_path)
+    return socket.get_something(CommandTypes.PING) == "ping"
+
 def cmd_start(config):
     # Check if socket exists
-    #if os.path.isfile("")
-        # Check if server is already running with a ping / getinfo command
-            # Error out noting that the server is already running
+    interfaces = cmd_list_interfaces()
+    if len(interfaces):
+        for interface in interfaces:
+            try:
+                if (ping(interface)):
+                    print(f"UDPServer is already running at {interface}", file = sys.stderr)
+                exit(1)
+            except ConnectionRefusedError:
+                pass
 
-        # Remove the socket
+            # Remove the socket
+            print(f"removing socket {run}/{interface}")
+            os.remove(f"{run}/{interface}")
+
     # Start the server
-    pass
+    if not os.path.isfile(config):
+        print(f"Config file {config} does not exist", file = sys.stderr)
+        exit(1)
+
+    subprocess.Popen(f"src/udpserver/udpserver.py {config}".split(" "))
 
 def cmd_stop():
     pass
@@ -75,6 +100,7 @@ def cmd_dump_interfaces():
     pass
 
 def cmd_list_interfaces():
-    global run
-    for item in os.listdir(run):
-        print(item)
+    files = []
+    for file in os.listdir(run):
+        files.append(file)
+    return files

@@ -4,7 +4,7 @@ interfaces:
     children:
       - name: phys-2
         interface-type: physical
-        ip: "10.0.0.131"
+        ip: "172.16.0.109"
         port: 8888
         amount-leds: 300
         max-udp-size: 320

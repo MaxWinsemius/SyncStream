@@ -29,9 +29,8 @@ class Command:
     PING = 2
     STOP = 3
     DUMP_INTERFACES = 4 # Dump the yaml interfaces config
-    LIST_INTERFACES = 5 # List all root interfaces
-    LAYERS_ADD = 20
-    LAYERS_DEL = 21
+    LAYERS_ADD = 100
+    LAYERS_DEL = 101
 
 class Handler(socketserver.StreamRequestHandler):
     def handle(self):
@@ -86,6 +85,9 @@ class Socket(socketserver.ForkingMixIn, socketserver.UnixStreamServer):
         if msg_type == Command.SEND_BUFFER:
             return self.root.send_buffer(msg_length, data, self)
 
+        if msg_type == Command.PING:
+            return self.root.ping()
+
 class Layer:
     def set_buffer(self, framebuffer):
         self.framebuffer = framebuffer
@@ -133,3 +135,10 @@ class Root:
 
         self.iface.set_rgb_array(0, self.iface.length, framebuffer)
         self.iface.send_udp_framebuffer()
+
+    def ping(self):
+        return struct.pack(Socket._struct_header + f"{len('ping')}s",
+                           bytes(Socket._MAGIC, 'utf-8'),
+                           len("ping"),
+                           Command.PING,
+                           bytes("ping", 'utf-8'))
