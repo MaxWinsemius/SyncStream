@@ -11,17 +11,23 @@ TODO:
 """
 
 from . import common
-import os
-import socket
-import socketserver
-import struct
-import yaml
 
-DEBUG = False
+import os
+import yaml
+import socket
+import struct
+import threading
+import socketserver
+from time import sleep
+
+DEBUG = True
 
 def deb_print(txt):
     if DEBUG:
         print(txt)
+
+class ExitUDPServerHandler(Exception):
+    pass
 
 class Command:
     GET_INFO = 0
@@ -48,7 +54,14 @@ class Handler(socketserver.StreamRequestHandler):
                 return
 
             # Execute command
-            response = self.server._exec_cmd(msg_length, msg_type, data)
+            try:
+                response = self.server._exec_cmd(msg_length, msg_type, data)
+            except ExitUDPServerHandler:
+                deb_print('ExitUDPServerHandler exception caught, erroring out')
+                #self.send_error(500)
+                self.server.server_close()
+                return
+
             deb_print("command exec'd")
             deb_print(f"resonse: {response}")
 
@@ -56,7 +69,7 @@ class Handler(socketserver.StreamRequestHandler):
                 deb_print("returning request data")
                 self.request.sendall(response)
 
-            deb_print("exiting while loop")
+            deb_print("Restarting while loop")
 
 class Socket(socketserver.ForkingMixIn, socketserver.UnixStreamServer):
     _MAGIC = 'TESLAN'
@@ -79,6 +92,7 @@ class Socket(socketserver.ForkingMixIn, socketserver.UnixStreamServer):
         return struct.unpack(self._struct_header, data[:self._struct_header_size])
 
     def _exec_cmd(self, msg_length, msg_type, data):
+        deb_print(f"CMD_TYPE {msg_type}")
         if msg_type == Command.GET_INFO:
             return self.root.get_info()
 
@@ -87,6 +101,26 @@ class Socket(socketserver.ForkingMixIn, socketserver.UnixStreamServer):
 
         if msg_type == Command.PING:
             return self.root.ping()
+
+        if msg_type == Command.STOP:
+            return self.stop()
+
+    def stop(self):
+        deb_print("stopping tcp server step 1")
+        self._BaseServer__shutdown_request = True
+        raise ExitUDPServerHandler
+
+        def kill_server(server):
+            deb_print("stopping tcp server step 3")
+            server.shutdown()
+            server.server_close()
+
+        deb_print("stopping tcp server step 2")
+        t = threading.Thread(target=kill_server, args=(self,))
+        t.start()
+        sleep(1)
+        deb_print("stopping tcp server step 4")
+        raise ExitUDPServerHandler
 
 class Layer:
     def set_buffer(self, framebuffer):

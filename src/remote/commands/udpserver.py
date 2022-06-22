@@ -62,13 +62,15 @@ def exec(args):
     else:
         print("Unknown command used!", file = sys.stderr)
 
-def ping(interface):
+def _get_socket(interface):
     socket_path = f"{run}/{interface}"
     if not os.path.exists(socket_path):
         print(f"Socket {socket_path} does not exist", file = sys.stderr)
         exit(1)
-    socket = Connection(socket_path)
-    return socket.get_something(CommandTypes.PING) == "ping"
+    return Connection(socket_path)
+
+def ping(interface):
+    return _get_socket(interface).get_something(CommandTypes.PING) == "ping"
 
 def cmd_start(config):
     # Check if socket exists
@@ -94,7 +96,14 @@ def cmd_start(config):
     subprocess.Popen(f"src/udpserver/udpserver.py {config}".split(" "))
 
 def cmd_stop():
-    pass
+    interfaces = cmd_list_interfaces()
+    for interface in interfaces:
+        print(f"Stopping interface {interface}", file = sys.stderr)
+        try:
+            _get_socket(interface).get_something(CommandTypes.STOP)
+        except ConnectionRefusedError:
+            print("Connection refused")
+            pass
 
 def cmd_dump_interfaces():
     pass

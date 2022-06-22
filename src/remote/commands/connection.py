@@ -40,7 +40,7 @@ class Connection:
     def _connect(self):
         self._cmd_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self._cmd_socket.connect(self._socket_path)
-    
+
     def _pack_string(self, msg_type, payload):
         """Packs the given message type and payload. Turns the resulting
         message into a byte string.
@@ -114,7 +114,7 @@ class Connection:
                 raise e
 
             self._connect()
-            
+
             return self._ipc_send(self._cmd_socket, message_type, payload)
         finally:
             self._cmd_lock.release()
@@ -127,7 +127,7 @@ class Connection:
         try:
             self._cmd_lock.acquire()
             if failed: self._connect()
-                
+
             self._cmd_socket.sendall(self._pack_integers(CommandTypes.SEND_BUFFER_CMD_ID, [e for E in buffer for e in E]))
             if failed: print("Connection re-established!")
         except ConnectionError as e:
@@ -139,7 +139,7 @@ class Connection:
             self.send_buffer(buffer, failed=True)
         finally:
             if self._cmd_lock.locked(): self._cmd_lock.release()
-            
+
 
     def close(self):
         self._cmd_socket.close()
