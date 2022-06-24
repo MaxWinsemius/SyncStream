@@ -18,22 +18,13 @@ Animation class should handle adding and removing animations, changing config fi
 from the config files (for easy dynamic use of a generic template).
 """
 
-import argparse
+import os
 import sys
+import sockets
+import argparse
 from enum import Enum
 
-class LogLevel(Enum):
-    ddebug = 0
-    debug = 1
-    info = 2
-    warning = 3
-    error = 4
-
-_loglevel = LogLevel.ddebug
-
-def log(loglevel, content):
-    if _loglevel <= loglevel:
-        print(f"{loglevel.name}: {content}", file=sys.stderr)
+from Log import *
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -44,5 +35,8 @@ if __name__ == "__main__":
         "socket": "/run/syncstream/ssd.socket",
         "animations": "src/animations/"
     }
-    Socket(socket_path, animation_path)
 
+    n = os.fork()
+    if n == 0:
+        s = sockets.Socket(paths["socket"], paths["animations"])
+        s.serve_forever()

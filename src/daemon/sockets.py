@@ -1,5 +1,9 @@
+import os
+import struct
+import commands
 import socketserver
-from . import commands
+
+from Log import *
 
 class Handler(socketserver.StreamRequestHandler):
     def handle(self):
@@ -27,7 +31,7 @@ class Handler(socketserver.StreamRequestHandler):
 
             log(LogLevel.ddebug, "exiting while loop")
 
-class Socket(socketserver.UnixStreamServer):
+class Socket(socketserver.ForkingMixIn, socketserver.UnixStreamServer):
     _MAGIC = 'TESLAN'
     _MAGIC_LEN = len(bytes(_MAGIC, 'utf-8'))
     _chunk_size = 8096
@@ -36,7 +40,6 @@ class Socket(socketserver.UnixStreamServer):
 
     def __init__(self, path, animation_path):
         self.path = path
-        # TODO: Create animation handler
         self.animation_path = animation_path
 
         if os.path.exists(path):
@@ -49,13 +52,10 @@ class Socket(socketserver.UnixStreamServer):
         return struct.unpack(self._struct_header, data[:self._struct_header_size])
 
     def _exec_cmd(self, msg_length, msg_type, data):
+        return
         if msg_type == commands.EXIT:
             # TODO: finish animation handler
             #self.animations.exit()
             exit(0)
 
-        #if msg_type == Command.GET_INFO:
-        #    return self.root.get_info()
 
-        #if msg_type == Command.SEND_BUFFER:
-        #    return self.root.send_buffer(msg_length, data, self)
