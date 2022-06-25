@@ -1,0 +1,51 @@
+#!/bin/env python3
+
+"""
+spio: Syncstream-pio. Use it like `pio` (platformio).
+
+This just makes sure that the right network hardware library is used in the C++ code. 
+
+Build your code:
+	./spio run (... uses default environment)
+	./spio run -e pro_wiz
+
+Upload your code:
+	./spio run -e pro_enc --target upload
+
+"""
+
+import sys, os, configparser
+
+network_hardware_environment_mapping = dict(
+	esp01_1m = "USING_ESP8266",
+	nano_wiz = "USING_WIZNET",
+	pro_wiz  = "USING_WIZNET",
+	nano_enc = "USING_ENC",
+	pro_enc  = "USING_ENC"
+)
+
+def sethw(hardware):
+	with open("src/network_hardware.h", "w") as f:
+		f.write(f"#define {hardware}\n")
+
+for environment, hardware in network_hardware_environment_mapping.items():
+	if environment in sys.argv:
+		print(f"HARDWARE {hardware}")
+		sethw(hardware)
+		break
+else:
+	try:
+		conf = configparser.ConfigParser()
+		conf.read("platformio.ini")
+		environment = conf["platformio"]["default_envs"]
+		hardware = network_hardware_environment_mapping[environment]
+		sethw(hardware)
+		print(f"USING DEFAULT HARDWARE ({hardware})")
+	except Exception:
+		print("ERROR: COULD NOT DETERMINE DEFAULT HARDWARE")
+		quit()
+
+comm = "pio " + " ".join(sys.argv[1:])
+print(f"EXECUTING '{comm}'")
+os.system(comm)
+

@@ -1,11 +1,7 @@
-#define USING_WIZNET
-// #define USING_ESP8266
-// #define USING_ENC
-
 /*   Includes   */
-
 #include <SPI.h>    
 #include <FastLED.h>
+#include "network_hardware.h"
 
 #if defined(USING_WIZNET)
   #include <Ethernet.h>
@@ -23,7 +19,7 @@
 #define LED_PACKET_BUFFER 320
 #define NUM_LEDS 250
 unsigned int localPort = 8888;
-byte mac[] = {0x1E, 0xE7, 0xBE, 0xEF, 0x13, 0x39};
+byte mac[] = {0xBE, 0xEF, 0x13, 0x37, 0xBE, 0x07};
 
 #if defined(USING_WIZNET) || defined(USING_ENC)
   EthernetUDP Udp;
