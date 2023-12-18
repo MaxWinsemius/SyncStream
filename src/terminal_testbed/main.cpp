@@ -93,7 +93,7 @@ void process_udp(char* buffer, unsigned char* frame_buffer, int numbytes, int fr
 int main( int argc, char* argv[] )
 {
     int buffer_size = 300;
-    char* port = "1337";
+    int port = 1337;
     int frame_buffer_size = 10;
     unsigned char* frame_buffer;
 

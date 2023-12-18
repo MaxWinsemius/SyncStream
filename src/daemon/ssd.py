@@ -22,7 +22,6 @@ import os
 import sys
 import sockets
 import argparse
-from enum import Enum
 
 from Log import *
 
