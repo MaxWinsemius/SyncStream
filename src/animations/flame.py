@@ -21,15 +21,13 @@ class Flame(Animation):
         self.top_flame_rows = 5       # The top rows with a stable flame
         self.wavy_rows_count = 10     # Number of rows below the stable flame that flicker sporadically
 
-        self.base_flame_color = self.colour
+        self.base_flame_colour = self.colour
         self.top_flame_flicker = 0.1          # Slight flicker at the top
         self.wavy_flicker_chance = 0.8         # Base probability each LED in wavy area flickers off
         self.wavy_flicker_intensity = 0.9      # Additional flicker intensity in wavy area
 
         self.ember_spawn_chance = 2          # Chance of spawning an ember
         self.ember_speed = 1                   # Rows per update embers move upward
-        self.ember_decay = 0.9                 # Ember brightness decay per update
-        self.ember_base_color = self.colour    # Ember color
         self.embers = [[] for _ in self.channels]  # Track embers per channel
         self.n_rows = 1
 
@@ -65,9 +63,9 @@ class Flame(Animation):
                     for col in range(row_led_count):
                         idx = (total_rows - 1 - row) * self.n_cols + col
                         if idx < length:
-                            r = min(1, self.base_flame_color[0] * flicker)
-                            g = min(1, self.base_flame_color[1] * flicker)
-                            b = min(1, self.base_flame_color[2] * flicker)
+                            r = min(1, self.base_flame_colour[0] * flicker)
+                            g = min(1, self.base_flame_colour[1] * flicker)
+                            b = min(1, self.base_flame_colour[2] * flicker)
                             frame_buffer[idx] = (r, g, b)
 
                 wavy_height = max(1, wavy_area_end - wavy_area_start - 1)
@@ -89,15 +87,15 @@ class Flame(Animation):
                         if idx < length:
                             if random.random() < current_flicker_chance:
                                 base_val = ((1-current_flicker_intensity) * random.random())*(1-wavy_height/(row-wavy_area_start))
-                                r = min(1, self.base_flame_color[0] * base_val)
-                                g = min(1, self.base_flame_color[1] * base_val)
-                                b = min(1, self.base_flame_color[2] * base_val)
+                                r = min(1, self.base_flame_colour[0] * base_val)
+                                g = min(1, self.base_flame_colour[1] * base_val)
+                                b = min(1, self.base_flame_colour[2] * base_val)
                             else:
                                 flicker = 1.0 + random.uniform(-current_flicker_intensity, current_flicker_intensity)
                                 flicker = max(0, flicker)
-                                r = min(1, self.base_flame_color[0] * flicker)
-                                g = min(1, self.base_flame_color[1] * flicker)
-                                b = min(1, self.base_flame_color[2] * flicker)
+                                r = min(1, self.base_flame_colour[0] * flicker)
+                                g = min(1, self.base_flame_colour[1] * flicker)
+                                b = min(1, self.base_flame_colour[2] * flicker)
 
                             frame_buffer[idx] = (r, g, b)
 
@@ -105,9 +103,8 @@ class Flame(Animation):
                 new_embers = []
                 for ember in self.embers[ch_index]:
                     ember['row'] -= self.ember_speed / self.speed
-                    ember['brightness'] *= self.ember_decay
 
-                    if ember['row'] < 0 or ember['brightness'] < 0.05:
+                    if ember['row'] < 0:
                         continue
 
                     erow = int(math.floor(ember['row']))
@@ -128,17 +125,7 @@ class Flame(Animation):
                         ecol = max(0, min(ember['col'], row_led_count - 1))
                         idx = erow * self.n_cols + ecol
                         if idx < length:
-                            b = ember['brightness']
-                            er = min(1, self.ember_base_color[0] * b)
-                            eg = min(1, self.ember_base_color[1] * b)
-                            eb = min(1, self.ember_base_color[2] * b)
-
-                            base_r, base_g, base_b = frame_buffer[idx]
-                            nr = min(1, base_r + er)
-                            ng = min(1, base_g + eg)
-                            nb = min(1, base_b + eb)
-                            frame_buffer[idx] = (nr, ng, nb)
-
+                            frame_buffer[idx] = (self.colour[0], self.colour[1], self.colour[2])
                             new_embers.append(ember)
 
                 self.embers[ch_index] = new_embers
