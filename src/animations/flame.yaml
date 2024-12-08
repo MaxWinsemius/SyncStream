@@ -1,0 +1,16 @@
+target_animation: Flame
+
+sockets:
+  - /run/syncstream/virt-1-0
+  - /run/syncstream/signpost-0
+
+parameters:
+  speed: 1
+  update_rate: 8
+  colour:
+    - 1
+    - 0
+    - 1
+
+metadata:
+  creator: woflje
