@@ -1,0 +1,18 @@
+target_animation: Barber
+
+sockets:
+  - /run/syncstream/virt-1-0
+  - /run/syncstream/signpost-0
+
+parameters:
+  speed: 1
+  update_rate: 20
+  colours:
+    - [1, 0, 0]   # Red
+    - [1, 1, 1]   # White
+    - [0, 0, 1]   # Blue
+  num_strokes: 3
+  stroke_width: 2
+
+metadata:
+  creator: woflje
