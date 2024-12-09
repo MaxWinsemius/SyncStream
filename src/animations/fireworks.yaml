@@ -1,0 +1,19 @@
+target_animation: Fireworks
+
+sockets:
+  - /run/syncstream/virt-1-0
+  - /run/syncstream/signpost-0
+
+parameters:
+  speed: 1
+  update_rate: 10
+  colour:
+    - 0.2
+    - 0
+    - 1
+  explosions_only: false  # true to skip the launch and only show explosions
+  spawn_rate: 0.2  # Chance (0-1) for a spark to spawn each frame
+  explosion_size: 6  # Radius of the explosion
+
+metadata:
+  creator: woflje
