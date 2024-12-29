@@ -39,7 +39,7 @@ class Running(BaseModel):
     # A running animation runs on an interface. It contains the overwritten
     # parameters of a config file.
     animation: Animation
-    interface: Interface
+    interfaces: list[Interface]
     properties: dict
     pid: int
 

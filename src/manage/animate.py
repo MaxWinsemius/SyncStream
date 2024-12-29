@@ -75,9 +75,9 @@ def _merge_parameters(base: dict, overlay: dict) -> dict:
     }}
 
 
-def start(name: str, interface: str, options=list[str]):
-    print(f"Starting animation '{name}' on interface " +
-          f"'{interface}' with options: {options}")
+def start(name: str, interfaces: list[str], options=list[str]):
+    print(f"Starting animation '{name}' on interfaces " +
+          f"'{interfaces}' with options: {options}")
 
     if options is None:
         options = {}
@@ -86,10 +86,18 @@ def start(name: str, interface: str, options=list[str]):
 
     # Ugly; yeah
     ani = [a for a in _get_animations() if a.name == name].pop()
-    iface = [i for i in get_interfaces() if i.name == interface].pop()
+    ifaces = [i for i in get_interfaces() if
+              i.name in interfaces]
 
-    assert isinstance(ani, Animation)
-    assert isinstance(iface, Interface)
+    try:
+        assert isinstance(ani, Animation)
+        assert isinstance(ifaces, list)
+        for iface in ifaces:
+            assert isinstance(iface, Interface)
+    except AssertionError as e:
+        print(ani)
+        print(ifaces)
+        raise e
 
     running = _get_running()
 
@@ -97,18 +105,27 @@ def start(name: str, interface: str, options=list[str]):
 
     with tempfile.NamedTemporaryFile(
          dir=_runfolder, suffix=".yaml", mode="w") as optionfile:
-        yaml.dump(_merge_parameters(ani.config, options), optionfile)
+        yaml.dump({**_merge_parameters(ani.config, options),
+                   'sockets': [
+                   os.path.join(_runfolder, i.name) for i in ifaces
+                   ]}, optionfile)
         optionfile.flush()
 
-        print("Starting process\n\n", file=sys.stderr)
+        print("Start print config\n\n", file=sys.stderr)
         process = Popen(['cat', optionfile.name])
+        print("\n\nEnd print config", file=sys.stderr)
+
+        print("Starting process\n\n", file=sys.stderr)
         process = Popen([runfile, optionfile.name])
+        # Sleep for a second to ensure that the cpu is switching to the new
+        # processes, ensuring that it loads in the temporary config file which
+        # gets deleted after exiting the `with` scope
         time.sleep(1)
 
     running.append(Running.model_validate({
         'animation': ani,
-        'interface': iface,
-        'properties': options,  # Actually apply options
+        'interfaces': ifaces,
+        'properties': options,
         'pid': process.pid,
     }))
 
