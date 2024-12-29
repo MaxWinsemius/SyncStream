@@ -58,15 +58,21 @@ def _get_animations() -> list[Animation]:
     return validated_animations
 
 
+def split_to_float(val: str, splits: list[str]) -> dict:
+    if val.isdigit() or val.isdecimal():
+        return float(val)
+
+    if len(splits) and splits[0] in val:
+        return [split_to_float(v, splits[1:]) for v in val.split(splits[0])]
+    return val
+
+
 def _convert_options(options: list[str]) -> dict:
     data = {}
     for option in options:
         key, val = option.split("=")
-        if val.isdigit():
-            val = int(val)
-        if isinstance(val, str) and ',' in val:
-            val = [v if not v.isdigit() else int(v) for v in val.split(',')]
-        data[key] = val
+        data[key] = split_to_float(val, [',', ':'])
+
     return {'parameters': data}
 
 
@@ -156,6 +162,7 @@ def stop(id):
     os.kill(run.pid, signal.SIGTERM)
 
     _write_running(_running)
+
 
 def ls():
     for ani in _get_animations():
