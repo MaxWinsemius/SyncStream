@@ -5,12 +5,12 @@
 # ./manage interface list
 # ./manage animation list
 # ./manage animation running
-# ./manage animation stop knigt_rider
+# ./manage animation stop <id>
 
 # ./manage animation start knight_rider <interface-name> \
 #          --option speed=1 -o update_rate=50 -o tail_length=15 -o colour=1,0,0
 
-# ./manage a s kg <interface-name>
+# ./manage a s knight_rider <interface-name>
 
 import argparse
 import signal
