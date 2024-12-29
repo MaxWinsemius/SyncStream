@@ -146,4 +146,12 @@ def ls():
 
 
 def running():
-    return
+    i = 0
+    for run in _get_running():
+        base_info = f"{i} (pid {run.pid}): "
+        base_info_spaces = len(base_info) * " "
+
+        interfaces = ", ".join([i.name for i in run.interfaces])
+        i += 1
+        print(f"{base_info}{run.animation.name} on {interfaces}")
+        print(f"{base_info_spaces}{run.properties['parameters']}")

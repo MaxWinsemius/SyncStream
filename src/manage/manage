@@ -91,7 +91,7 @@ if args.command in ['animation', 'a']:
         animate.ls()
     elif args.animation_command in ['running', 'run', 'r']:
         # Handle running animations...
-        print("Listing running animations...")
+        animate.running()
 elif args.command in ['interface', 'i']:
     if args.interface_command in ['list', 'ls', 'l']:
         ifaces = interface.get_interfaces()
