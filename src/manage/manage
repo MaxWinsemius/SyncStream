@@ -1,0 +1,106 @@
+#!/bin/env python
+
+# ./manage animation start knight_rider <interface-name>
+# ./manage animation start knight_rider <interface-name>,if2,if3
+# ./manage interface list
+# ./manage animation list
+# ./manage animation running
+# ./manage animation stop <id>
+
+# ./manage animation start knight_rider <interface-name> \
+#          --option speed=1 -o update_rate=50 -o tail_length=15 -o colour=1,0,0
+
+# ./manage a s knight_rider <interface-name>
+
+import argparse
+import signal
+import sys
+
+import animate
+import interface
+import state
+
+
+def signal_handler(sig, frame):
+    state.try_release_lock()
+    sys.exit(0)
+
+
+signal.signal(signal.SIGINT, signal_handler)
+
+parser = argparse.ArgumentParser(prog='manage')
+subparsers = parser.add_subparsers(
+    dest='command', required=True, help='Main commands')
+
+# --- animation (a) command ---
+animation_parser = subparsers.add_parser(
+    'animation', aliases=['a'], help='Animation commands')
+animation_subparsers = animation_parser.add_subparsers(
+    dest='animation_command', required=True, help='Animation subcommands')
+
+# animation start (s)
+animation_start_parser = animation_subparsers.add_parser(
+    'start', aliases=['s'], help='Start an animation')
+animation_start_parser.add_argument(
+    'animation_name', help='Name of the animation (e.g. knight_rider)')
+animation_start_parser.add_argument(
+    'interfaces',
+    help='One or more interfaces, comma-separated (e.g. eth0 or eth0,eth1)')
+animation_start_parser.add_argument(
+    '-o', '--option', action='append',
+    help='Option in key=value format, can be used multiple times')
+
+# animation stop (st)
+animation_stop_parser = animation_subparsers.add_parser(
+    'stop', aliases=['st'], help='Stop an animation')
+animation_stop_parser.add_argument(
+    'animation_number', type=int,
+    help='Number of the animation to stop\nSee ./manage animation running ' +
+         'for the correct numbers')
+
+# animation list (l)
+animation_subparsers.add_parser(
+    'list', aliases=['l', 'ls'], help='List available animations')
+
+# animation running (r)
+animation_subparsers.add_parser(
+    'running', aliases=['r', 'run'], help='List running animations')
+
+# --- interface (i) command ---
+interface_parser = subparsers.add_parser(
+    'interface', aliases=['i'], help='Interface commands')
+interface_subparsers = interface_parser.add_subparsers(
+    dest='interface_command', required=True, help='Interface subcommands')
+
+# interface list (l)
+interface_list_parser = interface_subparsers.add_parser(
+    'list', aliases=['l', 'ls'], help='List available interfaces')
+
+args = parser.parse_args()
+
+# Example logic handling:
+if args.command in ['animation', 'a']:
+    if args.animation_command in ['start', 's']:
+        # Handle starting the animation...
+        state.get_lock()
+        animate.start(args.animation_name, args.interfaces, args.option)
+
+    elif args.animation_command in ['stop', 'st']:
+        # Handle stopping the animation...
+        state.get_lock()
+        animate.stop(args.animation_number)
+    elif args.animation_command in ['list', 'ls', 'l']:
+        # Handle listing animations...
+        animate.ls()
+    elif args.animation_command in ['running', 'run', 'r']:
+        # Handle running animations...
+        animate.running()
+elif args.command in ['interface', 'i']:
+    if args.interface_command in ['list', 'ls', 'l']:
+        ifaces = interface.get_interfaces()
+        for iface in ifaces:
+            print(iface)
+    else:
+        print("interface doesn't know this command")
+
+state.try_release_lock()

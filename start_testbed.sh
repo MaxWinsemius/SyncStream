@@ -28,7 +28,7 @@ tmux split-window   -t "$sesh" -h
 tmux send-keys      -t "$sesh" "./src/terminal_testbed/a.out $numleds 1339" Enter
 tmux select-pane    -t "$sesh" -t "{bottom}"
 tmux send-keys      -t "$sesh" "./src/udpserver/udpserver.py ./src/udpserver/terminal_testbed.yaml" Enter
-tmux split-window   -t "$sesh" -h -c ./animations
+tmux split-window   -t "$sesh" -h
 sleep 1
 tmux send-keys      -t "$sesh" "ls -1" Enter
 tmux send-keys      -t "$sesh" "./src/animations/knight_rider.py" Enter
