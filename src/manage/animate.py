@@ -80,7 +80,7 @@ def start(name: str, interfaces: list[str], options=list[str]):
           f"'{interfaces}' with options: {options}")
 
     if options is None:
-        options = {}
+        options = {'parameters': {}}
     else:
         options = _convert_options(options)
 
@@ -112,7 +112,8 @@ def start(name: str, interfaces: list[str], options=list[str]):
         optionfile.flush()
 
         print("Start print config\n\n", file=sys.stderr)
-        process = Popen(['cat', optionfile.name])
+        print_debug = Popen(['cat', optionfile.name])
+        print_debug.wait()
         print("\n\nEnd print config", file=sys.stderr)
 
         print("Starting process\n\n", file=sys.stderr)
@@ -120,6 +121,8 @@ def start(name: str, interfaces: list[str], options=list[str]):
         # Sleep for a second to ensure that the cpu is switching to the new
         # processes, ensuring that it loads in the temporary config file which
         # gets deleted after exiting the `with` scope
+        # process.wait() doesn't work here, since the subprocess is intended to
+        # fork.
         time.sleep(1)
 
     running.append(Running.model_validate({
