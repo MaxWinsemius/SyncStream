@@ -54,7 +54,9 @@ animation_start_parser.add_argument(
 animation_stop_parser = animation_subparsers.add_parser(
     'stop', aliases=['st'], help='Stop an animation')
 animation_stop_parser.add_argument(
-    'animation_name', help='Name of the animation to stop')
+    'animation_number', type=int,
+    help='Number of the animation to stop\nSee ./manage animation running ' +
+         'for the correct numbers')
 
 # animation list (l)
 animation_subparsers.add_parser(
@@ -86,6 +88,7 @@ if args.command in ['animation', 'a']:
     elif args.animation_command in ['stop', 'st']:
         # Handle stopping the animation...
         state.get_lock()
+        animate.stop(args.animation_number)
     elif args.animation_command in ['list', 'ls', 'l']:
         # Handle listing animations...
         animate.ls()

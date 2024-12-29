@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import yaml
+import signal
 import tempfile
 from subprocess import Popen
 
@@ -135,10 +136,26 @@ def start(name: str, interfaces: list[str], options=list[str]):
     _write_running(running)
 
 
-def stop(name):
-    print(f"Stopping animation '{name}'")
-    return
+def print_running(id: int, pid: int, name: str, interfaces: list[Interface],
+                  properties: dict):
+    base_info = f"{id} (pid {pid}): "
+    base_info_spaces = len(base_info) * " "
 
+    interfaces = ", ".join([i.name for i in interfaces])
+    print(f"{base_info}{name} on {interfaces}")
+    print(f"{base_info_spaces}{properties['parameters']}")
+
+
+def stop(id):
+    _running = _get_running()
+    run = _running.pop(id)
+    print("Terminating animation", file=sys.stderr)
+    print_running(id, run.pid, run.animation.name, run.interfaces,
+                  run.properties)
+
+    os.kill(run.pid, signal.SIGTERM)
+
+    _write_running(_running)
 
 def ls():
     for ani in _get_animations():
@@ -148,10 +165,6 @@ def ls():
 def running():
     i = 0
     for run in _get_running():
-        base_info = f"{i} (pid {run.pid}): "
-        base_info_spaces = len(base_info) * " "
-
-        interfaces = ", ".join([i.name for i in run.interfaces])
+        print_running(i, run.pid, run.animation.name, run.interfaces,
+                      run.properties)
         i += 1
-        print(f"{base_info}{run.animation.name} on {interfaces}")
-        print(f"{base_info_spaces}{run.properties['parameters']}")
