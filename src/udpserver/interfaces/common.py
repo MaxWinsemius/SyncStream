@@ -3,11 +3,13 @@
 @date 15-01-2022
 """
 
+
 class InterfaceStartStopRangeException(Exception):
     pass
 
+
 class Clr():
-    def __init__(self, r = 0, g = 0, b = 0):
+    def __init__(self, r=0, g=0, b=0):
         self.r = r
         self.g = g
         self.b = b
@@ -23,24 +25,42 @@ class Clr():
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):
-            return Clr(int(self.r * other), int(self.g * other), int(self.b * other))
+            return Clr(
+                int(self.r * other),
+                int(self.g * other),
+                int(self.b * other))
 
         if isinstance(other, Clr):
-            return Clr(int(self.r * other.r), int(self.g * other.g), int(self.b * other.b))
+            return Clr(
+                int(self.r * other.r),
+                int(self.g * other.g),
+                int(self.b * other.b))
 
     def __add__(self, other):
         if isinstance(other, (int, float)):
-            return Clr(int(self.r + other), int(self.g + other), int(self.b + other))
+            return Clr(
+                int(self.r + other),
+                int(self.g + other),
+                int(self.b + other))
 
         if isinstance(other, Clr):
-            return Clr(int(self.r + other.r), int(self.g + other.g), int(self.b + other.b))
+            return Clr(
+                int(self.r + other.r),
+                int(self.g + other.g),
+                int(self.b + other.b))
 
     def __sub__(self, other):
         if isinstance(other, (int, float)):
-            return Clr(int(self.r - other), int(self.g - other), int(self.b - other))
+            return Clr(
+                int(self.r - other),
+                int(self.g - other),
+                int(self.b - other))
 
         if isinstance(other, Clr):
-            return Clr(int(self.r - other.r), int(self.g - other.g), int(self.b - other.b))
+            return Clr(
+                int(self.r - other.r),
+                int(self.g - other.g),
+                int(self.b - other.b))
 
     def __eq__(self, other):
         return self.r == other.r and self.g == other.g and self.b == other.b
@@ -59,16 +79,20 @@ class Clr():
     def get_tuple(self):
         return self.r, self.g, self.b
 
+
 class Interface():
     def check_start_stop_range(self, start, stop, length):
         if start >= stop:
             raise InterfaceStartStopRangeException("Start is bigger than stop")
 
         if stop > self.length:
-            raise InterfaceStartStopRangeException("Start is bigger than length")
+            raise InterfaceStartStopRangeException(
+                "Start is bigger than length")
 
         if stop - start != length:
-            raise InterfaceStartStopRangeException("Difference between start and stop are not as big as the array length")
+            raise InterfaceStartStopRangeException(
+                "Difference between start and stop are not as big as the " +
+                "array length")
 
     def send_udp_framebuffer(self):
         """Sends the current framebuffer to the interface"""
@@ -79,7 +103,8 @@ class Interface():
         pass
 
     def set_rgb_array(self, start, stop, rgb_array):
-        """Sets the led colors in bulk using seperate rgb values. Requires `(stop - start) % 3 = 0`"""
+        """Sets the led colors in bulk using seperate rgb values.
+        Requires `(stop - start) % 3 = 0`"""
         pass
 
     def set_led(self, index, color):
@@ -91,11 +116,13 @@ class Interface():
         pass
 
     def add_updating_range(self, start, stop):
-        """Adds a range of the framebuffer to update. Also seen as unfreezing a range"""
+        """Adds a range of the framebuffer to update. Also seen as unfreezing
+        a range"""
         pass
 
     def remove_updating_range(self, start, stop):
-        """Remove a range of the framebuffer to update. Also seen as freezing a range"""
+        """Remove a range of the framebuffer to update. Also seen as freezing
+        a range"""
         pass
 
     def set_updating_range(self, start, stop, update):

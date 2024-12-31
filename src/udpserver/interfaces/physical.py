@@ -5,17 +5,17 @@
 
 from . import common
 import socket
-import math
-import time
 
-# TODO: Implement this. It removes the capabilities of setting the framebuffer_update array and checks if the
-# previous send_framebuffer send the same data as the currently sending one, and therefore skips sending
-# specific leds.
+# TODO: Implement this. It removes the capabilities of setting the framebuffer
+# update array and checks if the previous send_framebuffer send the same data
+# as the currently sending one, and therefore skips sending specific leds.
 OPTIMIZED_UDP = False
 DEBUG_SEND_UDP_PRINT = False
 
+
 class PhysicalInterface(common.Interface):
-    def __init__(self, ip, port, length, PACKET_LENGTH, maxbr, invert = False, MAX_INDEX = 4095, BIT_SHIFT = 4):
+    def __init__(self, ip, port, length, PACKET_LENGTH, maxbr,
+                 invert=False, MAX_INDEX=4095, BIT_SHIFT=4):
         self.ip = ip
         self.port = port
         self.length = length
@@ -29,7 +29,9 @@ class PhysicalInterface(common.Interface):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         if length > MAX_INDEX:
-            raise ValueError(f"Trying to create physical interface with {length + 1} leds, but only supports 4096 leds")
+            raise ValueError(
+                f"Trying to create physical interface with {length + 1} " +
+                " leds, but only supports 4096 leds")
 
         self.framebuffer = [common.Clr() for i in range(length)]
         self.framebuffer_previous = [common.Clr() for i in range(length)]
@@ -57,11 +59,14 @@ class PhysicalInterface(common.Interface):
     def get_and_update_udp_framebuffer(self):
         fb = bytes()
 
-        for i in [k for k in range(self.length) if self.should_i_update_this_frame(k)]:
+        for i in [k for k in range(self.length)
+                  if self.should_i_update_this_frame(k)]:
             c_index = i if not self.invert else self.length - 1 - i
-            ir, il = i%self.BIT_MULT, i//self.BIT_MULT
-            r, g, b = [int(x/(256/self.BIT_MULT)*self.maxbr/(self.BIT_MULT-1)) for x in self.framebuffer[c_index].get_tuple()]
-            self.framebuffer_previous[c_index].deepcopy(self.framebuffer[c_index])
+            ir, il = i % self.BIT_MULT, i//self.BIT_MULT
+            r, g, b = [int(x/(256/self.BIT_MULT)*self.maxbr/(self.BIT_MULT-1))
+                       for x in self.framebuffer[c_index].get_tuple()]
+            self.framebuffer_previous[c_index].deepcopy(
+                self.framebuffer[c_index])
 
             fb += bytes([
                 il,

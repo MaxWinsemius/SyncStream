@@ -10,22 +10,23 @@ TODO:
     - Implement delete_layer
 """
 
-from . import common
 import os
-import socket
 import socketserver
 import struct
 import yaml
 
 DEBUG = False
 
+
 def deb_print(txt):
     if DEBUG:
         print(txt)
 
+
 class Command:
     GET_INFO = 0
     SEND_BUFFER = 1
+
 
 class Handler(socketserver.StreamRequestHandler):
     def handle(self):
@@ -36,7 +37,8 @@ class Handler(socketserver.StreamRequestHandler):
             deb_print("recv data")
 
             # Get headers
-            msg_magic, msg_length, msg_type = Socket._unpack_header(Socket, data)
+            msg_magic, msg_length, msg_type = Socket._unpack_header(
+                Socket, data)
 
             if str(msg_magic, 'utf-8') != Socket._MAGIC:
                 print("OH NO FUCK THAT AINT NO MAGIC")
@@ -52,6 +54,7 @@ class Handler(socketserver.StreamRequestHandler):
                 self.request.sendall(response)
 
             deb_print("exiting while loop")
+
 
 class Socket(socketserver.ForkingMixIn, socketserver.UnixStreamServer):
     _MAGIC = 'TESLAN'
@@ -71,7 +74,8 @@ class Socket(socketserver.ForkingMixIn, socketserver.UnixStreamServer):
         socketserver.UnixStreamServer.__init__(self, path, Handler, True)
 
     def _unpack_header(self, data):
-        return struct.unpack(self._struct_header, data[:self._struct_header_size])
+        return struct.unpack(self._struct_header,
+                             data[:self._struct_header_size])
 
     def _exec_cmd(self, msg_length, msg_type, data):
         if msg_type == Command.GET_INFO:
@@ -80,9 +84,11 @@ class Socket(socketserver.ForkingMixIn, socketserver.UnixStreamServer):
         if msg_type == Command.SEND_BUFFER:
             return self.root.send_buffer(msg_length, data, self)
 
+
 class Layer:
     def set_buffer(self, framebuffer):
         self.framebuffer = framebuffer
+
 
 class Root:
     _CMD_ID_GET_INFO = 0
@@ -93,7 +99,7 @@ class Root:
         self.layers = []
         self.insert_layer(path, 0)
 
-    def insert_layer(self, path, index, authorative = True):
+    def insert_layer(self, path, index, authorative=True):
         layer = Layer()
         layer.path = f"{path}-{len(self.layers)}"
         layer.socket = Socket(self, layer.path)
@@ -107,7 +113,7 @@ class Root:
 
     def get_info(self):
         yaml_dat = yaml.dump({
-            'num_leds': self.iface.length #TODO Add layer info here
+            'num_leds': self.iface.length  # TODO Add layer info here
         })
         yaml_bytes = bytes(yaml_dat, 'utf-8')
 
@@ -119,14 +125,15 @@ class Root:
 
     def send_buffer(self, msg_length, data, socket):
         if msg_length % 3 != 0:
-            print(f"received inconsistend buffer of length {msg_length} % 3 = {msg_length % 3}")
-            return
+            print(f"received inconsistend buffer of length {msg_length} % 3 " +
+                  "= {msg_length % 3}")
 
         if msg_length / 3 != self.iface.length:
-            print(f"Received buffer length of {msg_length} whilst interface is of length {self.iface.length}")
-            return
+            print(f"Received buffer length of {msg_length} whilst interface " +
+                  "is of length {self.iface.length}")
 
-        framebuffer = struct.unpack(f"={msg_length}I", data[Socket._struct_header_size:])
+        framebuffer = struct.unpack(f"={msg_length}I",
+                                    data[Socket._struct_header_size:])
 
         self.iface.set_rgb_array(0, self.iface.length, framebuffer)
         self.iface.send_udp_framebuffer()
